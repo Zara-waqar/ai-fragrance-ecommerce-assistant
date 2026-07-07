@@ -1,0 +1,1157 @@
+{
+  "name": "Lecture-15",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.input }}",
+        "options": {
+          "systemMessage": "You are a sales assistant for Saey Fragrances with these tools:\n- Web search (research perfumes)\n- Vector store (Saey product catalog)\n- Order tools (create/view/update orders in Google Sheets)\n\nWORKFLOW:\n1. Ask user's favorite perfume or preferences (fresh/warm/sweet, \n   occasion, season)\n2. Web search the perfume for notes, gender, season, fragrance family\n3. Search vector store for matching Saey products\n4. Recommend 2-3 options with name, notes, price, why it matches\n5. If the customer wants to place an order:\n   - Collect the customer's name, delivery address, and perfume(s) with quantity.\n   - Confirm all order details with the customer before creating the order.\n   - Generate an order number in the format SAEY-[5 random digits].\n   - Create the order in Google Sheets.\n   - Set the order status to \"UNPAID CONFIRMED\" by default.\n   - Ask the customer for their email address.\n   - After receiving and confirming the email address, send the order confirmation using the Gmail tool.\n6. Order management: use Get/Update tools as needed\n\nORDER STATUS OPTIONS: UNPAID CONFIRMED, PAID CONFIRMED, CANCELLED, \nPENDING\n\n\nTONE: Friendly, knowledgeable, not pushy. Use perfume terms naturally.\n\nRULES:\n- Always web search before recommending\n- Only recommend Saey products from vector store\n- Confirm order details before creating\n- If no match: suggest based on similar notes/style\n\nRESPONSE STYLE:\n\n- Keep every response concise and natural.\n- Answer in 2–5 short sentences whenever possible.\n- Do not give long explanations unless the customer specifically asks.\n- Recommend a maximum of 2 products.\n- Mention only the most relevant fragrance notes.\n- Avoid repeating information.\n- Do not use em dashes (—) or long dashes.\n- Use commas or full stops instead.\n- Avoid excessive bullet points.\n- Write like a friendly perfume consultant, not a formal report.\n- Keep every customer response under 900 characters.\n\nEXAMPLE:\nUser: \"I love Dior Sauvage\"\nYou: [search] \"Sauvage has bergamot, pepper, ambroxan – fresh & spicy. \nTry our Saey Nebula – same fresh pepper opening with woody base. \n$65/100ml. Interested?\"\n\nSEND ORDER UPDATES USING GMAIL TOOL BY ASKING CUSTOMER FOR THEIR EMAIL AND VERIFYING.\n\nEMAIL RULES:\n\n- Ask for the customer's email address only after the order details have been confirmed.\n- Send the confirmation email only after the order has been successfully created in Google Sheets.\n- The email should include the order number, ordered products, quantities, delivery address, and clearly state that the current order status is \"UNPAID CONFIRMED\" unless payment has been confirmed."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        848,
+        48
+      ],
+      "id": "59964828-0df1-483d-bb31-c1ea1a0a15bb",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "content": "## Requirement\nBuild an AI system for an e-commerce perfume brand that:\n*  Confirm payment <>\n*  Acts as an AI assistant </>\n*  Assists customers </>\n*  Provides information about the brand </>\n*  Deployed on Instagram </>\n*  Handles voice messages </>\n*  Order management </>\n\n\n",
+        "height": 336,
+        "width": 416,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -672,
+        -576
+      ],
+      "typeVersion": 1,
+      "id": "2b6ed2c2-335b-4d09-95d5-5a94fca74400",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {
+          "maxTokens": 1000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        256,
+        512
+      ],
+      "id": "778ac4f9-28b0-4c20-9f6d-3e643c91d6a6",
+      "name": "OpenAI Chat Model",
+      
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.body.entry[0].messaging[0].sender.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        416,
+        512
+      ],
+      "id": "4dc0d9e1-4bef-408d-8b6e-2f968ef950eb",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        320,
+        -480
+      ],
+      "id": "c82cdcae-7c15-4a8f-8490-6402c1a0b1fc",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "fragrance_knowledge_base",
+          "mode": "list",
+          "cachedResultName": "fragrance_knowledge_base"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        656,
+        -480
+      ],
+      "id": "5852bc8d-5fe4-486d-9539-13c4c6fff27a",
+      "name": "Supabase Vector Store",
+      
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1NhNK6X04L8o28tQzK8YX1iltbvsxU6n8",
+          "mode": "list",
+          "cachedResultName": "SAEY Fragrances Knowledge Base.docx",
+          "cachedResultUrl": "https://docs.google.com/document/d/1NhNK6X04L8o28tQzK8YX1iltbvsxU6n8/edit?usp=drivesdk&ouid=101878691461532100845&rtpof=true&sd=true"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        480,
+        -480
+      ],
+      "id": "df10c7ea-ab7c-473b-97f2-4694477f7a97",
+      "name": "Download file",
+      
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        608,
+        -320
+      ],
+      "id": "b054d8f9-a198-4dd8-8e90-e3546268082a",
+      "name": "Embeddings OpenAI",
+      
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        784,
+        -320
+      ],
+      "id": "ae16845b-568d-4cf9-bf44-c75671575ead",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Use the vector store to answer questions about SAEY Fragrances",
+        "tableName": {
+          "__rl": true,
+          "value": "fragrance_knowledge_base",
+          "mode": "list",
+          "cachedResultName": "fragrance_knowledge_base"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        1824,
+        512
+      ],
+      "id": "7dc20d42-3e39-430c-8548-e1d41cd8ea0b",
+      "name": "Supabase Vector Store1",
+      
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2032,
+        656
+      ],
+      "id": "088d4b3c-e9fb-4217-9854-35c3b142fd24",
+      "name": "Embeddings OpenAI1",
+      
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use this tool to browse the web.",
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_TAVILY_API_KEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.4,
+      "position": [
+        1664,
+        512
+      ],
+      "id": "08b4cb20-7cda-48ed-a527-e72a96181b19",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Create perfume orders with this tool.",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1B0APF8g4_jVjpHRXakrVA3dcIPcFHUBeoB2xTRZJyk8",
+          "mode": "list",
+          "cachedResultName": "Sample Order Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1B0APF8g4_jVjpHRXakrVA3dcIPcFHUBeoB2xTRZJyk8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1B0APF8g4_jVjpHRXakrVA3dcIPcFHUBeoB2xTRZJyk8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Order Number": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Order_Number', ``, 'string') }}",
+            "Customer Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Customer_Name', ``, 'string') }}",
+            "Address ": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Address_', ``, 'string') }}",
+            "Order Details": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Order_Details', ``, 'string') }}",
+            "Order Status": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Order_Status', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Order Number",
+              "displayName": "Order Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Customer Name",
+              "displayName": "Customer Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Address ",
+              "displayName": "Address ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Order Details",
+              "displayName": "Order Details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Order Status",
+              "displayName": "Order Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        576,
+        512
+      ],
+      "id": "cd775ece-065f-49f2-bff8-41b14526ae86",
+      "name": "Create Order",
+      
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to update order status(UNPAID CONFIRMED, PAID CONFIRMED, CANCELLED, PENDING).",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1B0APF8g4_jVjpHRXakrVA3dcIPcFHUBeoB2xTRZJyk8",
+          "mode": "list",
+          "cachedResultName": "Sample Order Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1B0APF8g4_jVjpHRXakrVA3dcIPcFHUBeoB2xTRZJyk8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1B0APF8g4_jVjpHRXakrVA3dcIPcFHUBeoB2xTRZJyk8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Order Number": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Order_Number', ``, 'string') }}",
+            "Order Status": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Order_Status', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "Order Number"
+          ],
+          "schema": [
+            {
+              "id": "Order Number",
+              "displayName": "Order Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Customer Name",
+              "displayName": "Customer Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Address ",
+              "displayName": "Address ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Order Details",
+              "displayName": "Order Details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Order Status",
+              "displayName": "Order Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        1472,
+        512
+      ],
+      "id": "7a6d538d-714b-4205-b6e6-e95de8efb171",
+      "name": "Update row in sheet in Google Sheets",
+      
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get order data",
+        "documentId": {
+          "__rl": true,
+          "value": "1B0APF8g4_jVjpHRXakrVA3dcIPcFHUBeoB2xTRZJyk8",
+          "mode": "list",
+          "cachedResultName": "Sample Order Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1B0APF8g4_jVjpHRXakrVA3dcIPcFHUBeoB2xTRZJyk8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1B0APF8g4_jVjpHRXakrVA3dcIPcFHUBeoB2xTRZJyk8/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        720,
+        512
+      ],
+      "id": "aacf8cda-03fc-453c-ac82-433a684d6d34",
+      "name": "Get row(s) in sheet in Google Sheets",
+      
+    },
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "3f48bc3e-8827-4776-a436-2836b18b31e7",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1408,
+        32
+      ],
+      "id": "3bccd83d-42e9-4e6b-8acc-276146fbd68a",
+      "name": "Webhook",
+      "webhookId": "3f48bc3e-8827-4776-a436-2836b18b31e7"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.query['hub.challenge'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -1168,
+        -192
+      ],
+      "id": "3a9763af-8f30-4634-b679-215dcf66b766",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.instagram.com/v25.0/me/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_INSTAGRAM_ACCESS_TOKEN"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "recipient.id",
+              "value": "={{ $('Webhook').first().json.body.entry[0].messaging[0].sender.id }}"
+            },
+            {
+              "name": "message.text",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1280,
+        48
+      ],
+      "id": "c696fa2d-ac43-488c-9bf4-04ebaf9e02c1",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5b26ee67-ebd2-460c-8a74-71b466162188",
+              "leftValue": "={{ $json.body.entry[0].messaging[0].message.is_echo }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        -1168,
+        48
+      ],
+      "id": "6eb31c3b-60fb-4570-b1ab-27ac48dda468",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        1280,
+        512
+      ],
+      "id": "7180e563-90d0-4a56-b820-30b9292ec13b",
+      "name": "Send a message in Gmail",
+      "webhookId": "0b2f3576-105f-4027-a547-4074642ea173",
+      
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -768,
+        48
+      ],
+      "id": "7822bdc0-3845-429a-a732-7b170b7f3591",
+      "name": "Wait",
+      "webhookId": "cda47c0e-9b07-45e2-8d21-a164bd596ef8"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "a16b1e12-ac97-4c4d-90d8-63cabef5b07f",
+                    "leftValue": "={{ $('Webhook').item.json.body.entry[0].messaging[0].message.attachments[0].type }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook').item.json.body.entry[0].messaging[0].message.text }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "2902ffdd-eb49-4312-ab87-53eefb229480"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "95b8e883-1a64-46f2-8786-94bd627d78dd",
+                    "leftValue": "={{ $('Webhook').item.json.body.entry[0].messaging[0].message.attachments[0].type }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -384,
+        32
+      ],
+      "id": "dd19b7da-f46b-4eaf-9001-3ac418978736",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Webhook').item.json.body.entry[0].messaging[0].message.attachments[0].payload.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -80,
+        160
+      ],
+      "id": "da014ca5-1a64-41ac-848b-aec0d2ce2d14",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        176,
+        160
+      ],
+      "id": "89bd12b5-ab17-4384-8283-1474568a9c2b",
+      "name": "Transcribe a recording",
+      
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.instagram.com/v25.0/me/messages",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "YOUR_INSTAGRAM_ACCESS_TOKEN"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "recipient.id",
+              "value": "={{ $json.body.entry[0].messaging[0].sender.id }}"
+            },
+            {
+              "name": "sender_action",
+              "value": "mark_seen"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -976,
+        48
+      ],
+      "id": "31a84449-965a-4488-88d9-e25079a5b3e2",
+      "name": "Mark_seen"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.instagram.com/v25.0/me/messages",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "YOUR_INSTAGRAM_ACCESS_TOKEN"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "recipient.id",
+              "value": "={{ $('Webhook').item.json.body.entry[0].messaging[0].sender.id }}"
+            },
+            {
+              "name": "sender_action",
+              "value": "typing_on"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -592,
+        48
+      ],
+      "id": "4ea038c1-2efe-40b6-a4c2-f1d6e4f5103d",
+      "name": "Typing_on"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6bf41ce7-6094-4efc-a3f1-45056ecbba81",
+              "name": "input",
+              "value": "={{ $('Webhook').item.json.body.entry[0].messaging[0].message.text }}\n{{ $json.text }}\n{{ $json['0'].content[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        496,
+        48
+      ],
+      "id": "c80809fd-75a4-4231-87b1-5753041f30fb",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "text": "=You are a Payment Screenshot Verification Specialist. Your job is to \nanalyze images and determine if they are legitimate payment screenshots.\n\n## Your Role\n\nWhen you receive an image, analyze it and communicate your findings to \nthe main AI agent in clear, natural language.\n\n## Analysis Steps\n\n1. **Identify the image type**\n   - Is this a payment/transaction screenshot?\n   - Or is it something else entirely?\n\n2. **If it's NOT a payment screenshot:**\n   - Simply describe what the image shows\n   - Tell the agent: \"User sent an image showing [brief description]\"\n\n3. **If it IS a payment screenshot, verify authenticity:**\n\n   **Check for manipulation signs:**\n   - Inconsistent fonts or misaligned elements\n   - Edited amounts or text (look for artifacts, cloning, overlays)\n   - UI elements that don't match the claimed platform\n   - Blurred or whited-out sections\n   - Screenshot-of-a-screenshot indicators\n**Verify timestamp:**\n- Current date/time is: {{ $now }}\n- Extract the date/time shown in the screenshot\n- Flag if it's more than 1 hour old\n- Note impossible or suspicious timestamps\n\n**Check transaction details:**\n- Can you clearly see: amount, sender, receiver, transaction ID?\n- Are all critical details present and legible?\n- Does the platform UI look authentic?\n\n## Your Response Format\n\nRespond in natural language using this structure:\n**For non-payment images:**\n\"User sent an image showing [description]. This is not a payment \nscreenshot.\"\n\n**For payment screenshots – ACCEPTED:**\n\"Payment screenshot ACCEPTED. This is a legitimate [platform name] \npayment of [amount] from [sender] to [receiver], timestamped [X minutes \nago]. Transaction appears authentic with no signs of manipulation.\"\n\n**For payment screenshots – REJECTED:**\n\"Payment screenshot REJECTED: Reason: [specific concerns]. The image \nshows [what you found suspicious – edited amounts, old timestamp, UI \ninconsistencies, etc.].\"\n\n**For payment screenshots – MANUAL REVIEW NEEDED:**\n\"Payment screenshot requires HUMAN REVIEW. I cannot confidently verify \nthis because: [specific reasons – unfamiliar platform, poor quality, \nambiguous signs, etc.]. The screenshot shows [what you can see], \ntimestamped [X minutes ago].\"\n\n## Decision Guidelines\n\n**Accept when:**\nScreenshot looks authentic with no editing signs\n- Timestamp is within last 1 hour \n- All critical details are visible and consistent\n- UI matches the authentic platform design\n- You're highly confident (90%+) it's legitimate\n\n**Reject when:**\n- Clear signs of photo editing or manipulation\n- Timestamp is older than 1 hour\n- Critical information is obscured or missing\n- UI doesn't match authentic platform design\n- Test/demo account indicators\n- Screenshot appears to be of another screenshot\n\n**Request manual review when:**\n- You're uncertain about authenticity (can't tell if it's edited)\n- Image quality is too poor to verify properly\n- Unfamiliar payment platform you can't confidently assess\n- Minor red flags that could be innocent\n- Anything that falls in the gray area\n\n## Important Principles\n\n- **Be specific** - Always explain WHY you're accepting, rejecting, or \nflagging\n- **Be honest** - If you can't tell, say so and request human review\n- **Prioritize security** - When in doubt, lean toward rejection or \nmanual review\n- **Check timestamps carefully** - This is a primary fraud indicator\n- **Look for editing artifacts** - Zoom in mentally on numbers and text\n- **Trust your analysis** - If something feels off, it probably is\n\nRemember: Your job is fraud prevention. It's better to flag legitimate \npayments for review than to accept fraudulent ones. Be thorough, be \nskeptical, and be clear in your communication.",
+        "inputType": "base64",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        176,
+        -96
+      ],
+      "id": "e6fb9b6c-537d-4eaa-af9c-f0e946f434f0",
+      "name": "Analyze image",
+      
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Webhook').item.json.body.entry[0].messaging[0].message.attachments[0].payload.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -80,
+        -96
+      ],
+      "id": "fd09f768-211c-4182-a486-86310179256e",
+      "name": "HTTP Request2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Order": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Mark_seen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Typing_on",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request4": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark_seen": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Typing_on": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Analyze image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "7be96d22-2b18-4538-abb1-7315d7173d54",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "649fa69c01c0bbecccd36eaf18a7e7c80501d7275941c59fd082685c2fb948c3"
+  },
+  "nodeGroups": [],
+  "id": "vtgqJQlED8kfGmzW",
+  "tags": []
+}
